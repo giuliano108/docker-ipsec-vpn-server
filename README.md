@@ -10,6 +10,10 @@ Docker image to run an IPsec VPN server, with support for both `IPsec/L2TP` and 
 
 Based on Debian Jessie with [Libreswan](https://libreswan.org) (IPsec VPN software) and [xl2tpd](https://github.com/xelerance/xl2tpd) (L2TP daemon).
 
+This docker image is based on [Lin Song work](https://github.com/hwdsl2/docker-ipsec-vpn-server) and adds those features:
+
+* Multiple VPN users declaration support
+
 ## Install Docker
 
 Follow [these instructions](https://docs.docker.com/engine/installation/) to get Docker running on your server.
@@ -44,11 +48,12 @@ This Docker image uses the following three environment variables, that can be de
 
 ```
 VPN_IPSEC_PSK=<IPsec pre-shared key>
-VPN_USER=<VPN Username>
-VPN_PASSWORD=<VPN Password>
+VPN_USER_CREDENTIAL_LIST=[{"login":"userTest1","password":"test1"},{"login":"userTest2","password":"test2"}]
 ```
 
-This will create a single user account for VPN login. The IPsec PSK (pre-shared key) is specified by the `VPN_IPSEC_PSK` environment variable. The VPN username is defined in `VPN_USER`, and VPN password is specified by `VPN_PASSWORD`.
+The IPsec PSK (pre-shared key) is specified by the `VPN_IPSEC_PSK` environment variable.
+Multiple user is supported. VPN user credentials is defined in `VPN_USER_CREDENTIAL_LIST` environnement variable.
+Users login and password must be defined in a json format array. Each user should be define with a "login" and a "password" attribute. 
 
 **Note:** In your `env` file, DO NOT put single or double quotes around values, or add space around `=`. Also, DO NOT use these characters within values: `\ " '`
 
@@ -77,7 +82,7 @@ docker run \
 
 ### Retrieve VPN login details
 
-If you did not set environment variables via an `env` file, `VPN_USER` will default to `vpnuser` and both `VPN_IPSEC_PSK` and `VPN_PASSWORD` will be randomly generated. To retrieve them, show the logs of the running container:
+If you did not set environment variables via an `env` file, a vpn user login will default to `vpnuser` and both `VPN_IPSEC_PSK` and vpn user password will be randomly generated. To retrieve them, show the logs of the running container:
 
 ```
 docker logs ipsec-vpn-server
@@ -90,8 +95,8 @@ Connect to your new VPN with these details:
 
 Server IP: <VPN Server IP>
 IPsec PSK: <IPsec pre-shared key>
-Username: <VPN Username>
-Password: <VPN Password>
+Users credentials :
+Login : <vpn user_login> Password : <vpn user_password>
 ```
 
 ### Check server status
