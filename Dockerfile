@@ -12,6 +12,7 @@ RUN apt-get -yqq update \
          libcap-ng-dev libcap-ng-utils libselinux1-dev \
          libcurl4-nss-dev libsystemd-dev flex bison gcc make \
          libunbound-dev libnss3-tools libevent-dev xl2tpd xmlto \
+		 jq \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/*
 
