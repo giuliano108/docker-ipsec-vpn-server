@@ -129,6 +129,7 @@ require chap = yes
 refuse pap = yes
 require authentication = yes
 name = l2tpd
+ppp debug = yes
 pppoptfile = /etc/ppp/options.xl2tpd
 length bit = yes
 EOF
@@ -144,15 +145,18 @@ auth
 crtscts
 mtu 1280
 mru 1280
+debug
 lock
 proxyarp
 lcp-echo-failure 4
 lcp-echo-interval 30
 connect-delay 5000
+logfd 2
+logfile /var/log/l2tpd.log
 EOF
 
 # Create VPN credentials
-echo "$VPN_USER_CREDENTIAL_LIST" | jq '.[] | .login + " l2tpd " + .password + " *"' > /etc/ppp/chap-secrets
+echo "$VPN_USER_CREDENTIAL_LIST" | jq -r '.[] | "\"" + .login + "\" l2tpd \"" + .password + "\" *"' > /etc/ppp/chap-secrets
 
 CREDENTIALS_NUMBER=`echo "$VPN_USER_CREDENTIAL_LIST" | jq 'length'`
 for (( i=0; i<=$CREDENTIALS_NUMBER - 1; i++ ))
@@ -247,5 +251,5 @@ modprobe af_key
 mkdir -p /var/run/pluto /var/run/xl2tpd
 rm -f /var/run/pluto/pluto.pid /var/run/xl2tpd.pid
 
-/usr/local/sbin/ipsec start --config /etc/ipsec.conf
+/usr/local/sbin/ipsec start --config /etc/ipsec.conf --debug-all --logile /var/log/ipsec.log
 exec /usr/sbin/xl2tpd -D -c /etc/xl2tpd/xl2tpd.conf
