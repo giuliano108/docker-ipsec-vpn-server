@@ -68,6 +68,7 @@ config setup
   nhelpers=0
   interfaces=%defaultroute
   uniqueids=no
+  perpeerlog=no
 
 conn shared
   left=$PRIVATE_IP
@@ -146,7 +147,6 @@ auth
 crtscts
 mtu 1280
 mru 1280
-debug
 lock
 proxyarp
 lcp-echo-failure 4
@@ -154,6 +154,9 @@ lcp-echo-interval 30
 connect-delay 5000
 logfd 2
 logfile /var/log/l2tpd.log
+welcome /etc/ppp/add-time
+connect /etc/ppp/add-time
+disconnect /etc/ppp/add-time
 EOF
 
 # Create VPN credentials
@@ -245,6 +248,70 @@ Setup VPN clients: https://git.io/vpnclients
 
 EOF
 
+# Create logger scripts
+
+## add-time
+cat > /etc/ppp/add-time << 'EOF'
+#!/bin/sh
+
+echo $(date) >> "/var/log/l2tpd.log"
+EOF
+chmod +x /etc/ppp/add-time
+
+## auth-up
+cat > /etc/ppp/auth-up << 'EOF'
+#!/bin/sh
+
+echo "$(date)	$2	login	$1" >> "/var/log/users.log"
+EOF
+chmod +x /etc/ppp/auth-up
+
+## auth-down
+cat > /etc/ppp/auth-down << 'EOF'
+#!/bin/sh
+
+echo "$(date)	$2	logout	$1" >> "/var/log/users.log"
+EOF
+chmod +x /etc/ppp/auth-down
+
+## ip-up
+cat > /etc/ppp/ip-up << 'EOF'
+#!/bin/sh
+
+echo "$(date)	$1	connection	$4	$5" >> "/var/log/users.log"
+EOF
+chmod +x /etc/ppp/ip-up
+
+## ip-down
+cat > /etc/ppp/ip-down << 'EOF'
+#!/bin/sh
+
+echo "$(date)	$1	disconnection	$4	$5	$CONNECT_TIME	$BYTES_SENT	$BYTES_RCVD" >> "/var/log/users.log"
+EOF
+chmod +x /etc/ppp/ip-down
+
+
+cat > /etc/ppp/ipv6-up << 'EOF'
+#!/bin/sh
+
+## ipv6-up
+echo "$(date)	$1	connection-v6	$4	$5" >> "/var/log/users.log"
+EOF
+chmod +x /etc/ppp/ipv6-up
+
+
+## ipv6-down
+cat > /etc/ppp/ipv6-down << 'EOF'
+#!/bin/sh
+
+echo "$(date)	$1	disconnection-v6	$4	$5	$CONNECT_TIME	$BYTES_SENT	$BYTES_RCVD" >> "/var/log/users.log"
+EOF
+chmod +x /etc/ppp/ipv6-down
+
+## Create and set right on users.log
+touch /var/log/users.log
+chmod +r /var/log/users.log
+
 # Load IPsec NETKEY kernel module
 modprobe af_key
 
@@ -252,5 +319,5 @@ modprobe af_key
 mkdir -p /var/run/pluto /var/run/xl2tpd
 rm -f /var/run/pluto/pluto.pid /var/run/xl2tpd.pid
 
-/usr/local/sbin/ipsec start --config /etc/ipsec.conf --debug-all --logile /var/log/ipsec.log
+/usr/local/sbin/ipsec start --config /etc/ipsec.conf --logile /var/log/ipsec.log
 exec /usr/sbin/xl2tpd -D -c /etc/xl2tpd/xl2tpd.conf

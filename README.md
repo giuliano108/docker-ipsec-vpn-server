@@ -76,9 +76,14 @@ docker run \
     --env-file ./vpn.env \
     -p 500:500/udp \
     -p 4500:4500/udp \
+    -p 1701:1701/udp \
     -v /lib/modules:/lib/modules:ro \
     -d --privileged \
+    --restart always \
+    -v /etc/localtime:/etc/localtime:ro \
+    -v /var/log/dockerlog/weenove-vpn:/var/log\
     hwdsl2/ipsec-vpn-server
+
 ```
 
 ### Retrieve VPN login details
