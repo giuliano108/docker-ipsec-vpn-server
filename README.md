@@ -81,7 +81,7 @@ docker run \
     -d --privileged \
     --restart always \
     -v /etc/localtime:/etc/localtime:ro \
-    -v /var/log/dockerlog/weenove-vpn:/var/log\
+    -v /var/log/dockerlog:/var/log\
     hwdsl2/ipsec-vpn-server
 
 ```
