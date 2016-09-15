@@ -160,7 +160,7 @@ lcp-echo-interval 30
 connect-delay 5000
 logfd 2
 logfile /var/log/l2tpd.log
-welcome /etc/ppp/add-time
+#welcome /etc/ppp/add-time
 connect /etc/ppp/add-time
 disconnect /etc/ppp/add-time
 EOF
@@ -260,7 +260,7 @@ EOF
 cat > /etc/ppp/add-time << 'EOF'
 #!/bin/sh
 
-echo $(date) >> "/var/log/l2tpd.log"
+echo $(date -R) >> "/var/log/l2tpd.log"
 EOF
 chmod +x /etc/ppp/add-time
 
@@ -268,7 +268,7 @@ chmod +x /etc/ppp/add-time
 cat > /etc/ppp/auth-up << 'EOF'
 #!/bin/sh
 
-echo "$(date)	$2	login	$1" >> "/var/log/users.log"
+echo "$(date -R)	$2	login	$1" >> "/var/log/users.log"
 EOF
 chmod +x /etc/ppp/auth-up
 
@@ -276,7 +276,7 @@ chmod +x /etc/ppp/auth-up
 cat > /etc/ppp/auth-down << 'EOF'
 #!/bin/sh
 
-echo "$(date)	$2	logout	$1" >> "/var/log/users.log"
+echo "$(date -R)	$2	logout	$1" >> "/var/log/users.log"
 EOF
 chmod +x /etc/ppp/auth-down
 
@@ -284,7 +284,7 @@ chmod +x /etc/ppp/auth-down
 cat > /etc/ppp/ip-up << 'EOF'
 #!/bin/sh
 
-echo "$(date)	$1	connection	$4	$5" >> "/var/log/users.log"
+echo "$(date -R)	$1	connection	$4	$5" >> "/var/log/users.log"
 EOF
 chmod +x /etc/ppp/ip-up
 
@@ -292,7 +292,7 @@ chmod +x /etc/ppp/ip-up
 cat > /etc/ppp/ip-down << 'EOF'
 #!/bin/sh
 
-echo "$(date)	$1	disconnection	$4	$5	$CONNECT_TIME	$BYTES_SENT	$BYTES_RCVD" >> "/var/log/users.log"
+echo "$(date -R)	$1	disconnection	$4	$5	$CONNECT_TIME	$BYTES_SENT	$BYTES_RCVD" >> "/var/log/users.log"
 EOF
 chmod +x /etc/ppp/ip-down
 
@@ -301,7 +301,7 @@ cat > /etc/ppp/ipv6-up << 'EOF'
 #!/bin/sh
 
 ## ipv6-up
-echo "$(date)	$1	connection-v6	$4	$5" >> "/var/log/users.log"
+echo "$(date -R)	$1	connection-v6	$4	$5" >> "/var/log/users.log"
 EOF
 chmod +x /etc/ppp/ipv6-up
 
@@ -310,7 +310,7 @@ chmod +x /etc/ppp/ipv6-up
 cat > /etc/ppp/ipv6-down << 'EOF'
 #!/bin/sh
 
-echo "$(date)	$1	disconnection-v6	$4	$5	$CONNECT_TIME	$BYTES_SENT	$BYTES_RCVD" >> "/var/log/users.log"
+echo "$(date -R)	$1	disconnection-v6	$4	$5	$CONNECT_TIME	$BYTES_SENT	$BYTES_RCVD" >> "/var/log/users.log"
 EOF
 chmod +x /etc/ppp/ipv6-down
 
