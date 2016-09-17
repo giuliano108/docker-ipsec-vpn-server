@@ -23,6 +23,7 @@ RUN wget -t 3 -T 30 -nv -O "libreswan-${SWAN_VER}.tar.gz" "https://download.libr
     && rm -f "libreswan-${SWAN_VER}.tar.gz" \
     && cd "libreswan-${SWAN_VER}" \
     && echo "WERROR_CFLAGS =" > Makefile.inc.local \
+    && echo "INITSYSTEM = sysvinit" > Makefile.inc.local \
     && make -s programs \
     && make -s install \
     && rm -rf "/opt/src/libreswan-${SWAN_VER}"
